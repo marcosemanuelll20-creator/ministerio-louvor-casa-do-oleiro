@@ -45,6 +45,18 @@
     .sidebar-spacer { flex: 1; }
     .sidebar-note { border: 1px solid rgba(255,255,255,.16); border-radius: 17px; padding: 14px; color: #f0cbd0; font-size: 12px; line-height: 1.45; background: rgba(255,255,255,.05); }
     .sidebar-note strong { display: block; color: #fff; margin-bottom: 4px; }
+    .auth-modal { position: fixed; inset: 0; z-index: 40; display: none; place-items: center; padding: 18px; background: rgba(42,27,32,.56); backdrop-filter: blur(6px); }
+    .auth-modal.open { display: grid; }
+    .auth-card { position: relative; width: min(100%, 440px); padding: 28px; background: var(--surface); border: 1px solid var(--line); border-radius: 24px; box-shadow: 0 26px 70px rgba(42,27,32,.3); }
+    .auth-card h2 { margin-bottom: 8px; }
+    .auth-copy { font-size: 13px; margin-bottom: 22px; }
+    .auth-close { position: absolute; top: 10px; right: 14px; border: 0; background: transparent; color: var(--muted); font-size: 28px; line-height: 1; }
+    .auth-actions { margin-top: 18px; }
+    .auth-logout { width: 100%; display: none; margin-top: 14px; }
+    .auth-status { min-height: 20px; margin: 14px 0 0; font-size: 12px; color: var(--deep-2); }
+    .auth-card.signed-in #auth-form { display: none; }
+    .auth-card.signed-in .auth-logout { display: inline-flex; }
+    .auth-card.signed-in .auth-copy:after { content: ' Você está conectado e as alterações serão sincronizadas.'; color: var(--deep-2); font-weight: 700; }
     .content-wrap { min-width: 0; flex: 1; background: radial-gradient(circle at 96% 5%, rgba(216,154,165,.12), transparent 24%), var(--canvas); }
     .topbar { height: 78px; background: rgba(255,250,251,.94); backdrop-filter: blur(14px); border-top: 4px solid var(--deep-2); border-bottom: 1px solid var(--line); box-shadow: 0 5px 20px rgba(84,21,31,.07); display: flex; align-items: center; justify-content: space-between; padding: 0 clamp(20px, 4vw, 55px); position: sticky; top: 0; z-index: 10; }
     .topbar-title { display: grid; gap: 2px; }
@@ -235,13 +247,46 @@
       <div class="sidebar-note"><strong>Primeira versão</strong>Os dados ficam salvos neste navegador enquanto testamos o sistema com a equipe.</div>
     </aside>
     <div class="content-wrap">
-      <header class="topbar"><div class="mobile-brand"><div class="brand-mark logo-mark"><img src="logo-casa-do-oleiro.png" alt="Logo Casa do Oleiro" /></div><span>Casa do Oleiro</span></div><div class="topbar-title"><strong>Ministério de Louvor Casa do Oleiro</strong><span>Repertório • Escalas • Cultos • Estudos</span></div><div class="topbar-right"><span class="online-dot"></span><span class="topbar-label">Modo de teste local</span></div></header>
+      <header class="topbar"><div class="mobile-brand"><div class="brand-mark logo-mark"><img src="logo-casa-do-oleiro.png" alt="Logo Casa do Oleiro" /></div><span>Casa do Oleiro</span></div><div class="topbar-title"><strong>Ministério de Louvor Casa do Oleiro</strong><span>Repertório • Escalas • Cultos • Estudos</span></div><div class="topbar-right"><span class="online-dot" id="connection-dot"></span><span class="topbar-label" id="connection-label">Modo local</span><button class="btn btn-sm btn-ghost" id="auth-button" type="button">Entrar</button></div></header>
       <main id="app"></main>
     </div>
   </div>
   <nav class="mobile-nav" id="mobile-nav"></nav>
   <div class="toast" id="toast"></div>
-  <script>
+  <div class="auth-modal" id="auth-modal" aria-hidden="true">
+    <div class="auth-card" role="dialog" aria-modal="true" aria-labelledby="auth-title">
+      <button class="auth-close" id="auth-close" type="button" aria-label="Fechar">×</button>
+      <p class="eyebrow">Acesso da equipe</p>
+      <h2 id="auth-title">Entrar no Casa do Oleiro</h2>
+      <p class="subtle auth-copy">Com login, repertórios, escalas e alterações ficam sincronizados para a equipe.</p>
+      <form id="auth-form">
+        <div class="field"><label for="auth-email">E-mail</label><input id="auth-email" type="email" required autocomplete="email" placeholder="seuemail@gmail.com" /></div>
+        <div class="field"><label for="auth-password">Senha</label><input id="auth-password" type="password" required minlength="6" autocomplete="current-password" placeholder="Mínimo de 6 caracteres" /></div>
+        <div class="form-actions auth-actions"><button class="btn btn-ghost" type="button" id="auth-create">Criar conta</button><button class="btn btn-primary" type="submit">Entrar</button></div>
+      </form>
+      <button class="btn btn-danger auth-logout" id="auth-logout" type="button">Sair da conta</button>
+      <p class="auth-status" id="auth-status"></p>
+    </div>
+  </div>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import { getFirestore, doc, getDoc, setDoc, addDoc, collection, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCWZ601k9PixroGwc50ZIUFxBWhoQU7Dbg",
+      authDomain: "igreja-casa-do-oleiro-2e2fb.firebaseapp.com",
+      projectId: "igreja-casa-do-oleiro-2e2fb",
+      storageBucket: "igreja-casa-do-oleiro-2e2fb.firebasestorage.app",
+      messagingSenderId: "923610674704",
+      appId: "1:923610674704:web:75538780f0e914b7883c95"
+    };
+    const firebaseApp = initializeApp(firebaseConfig);
+    const auth = getAuth(firebaseApp);
+    const db = getFirestore(firebaseApp);
+    let currentUser = null;
+    let cloudSaveTimer = null;
+
     const STORAGE_KEY = 'casa-do-oleiro-louvor-v1';
     const songNames = [
       ['Ruja o Leão','Isaias Saad','G','Celebração'],['A Vitória Chegou','Aurelina Dourado','D','Celebração'],['Deus de Promessas','Toque no Altar','G','Fé'],['Lugar Secreto','Gabriela Rocha','E','Adoração'],['Bondade de Deus','Isaías Saad','G','Adoração'],['Ninguém Explica Deus','Preto no Branco','A','Fé'],['Algo Novo','Kemuel','D','Avivamento'],['Ousado Amor','Isaías Saad','G','Adoração'],['Santo Espírito','Laura Souguellis','C','Adoração'],['Jeová Jireh','Aline Barros','D','Fé'],['A Casa é Sua','Casa Worship','D','Consagração'],['Todavia Me Alegrarei','Samuel Messias','C','Fé'],['Ele Vem','Gabriela Rocha','E','Avivamento'],['Deserto','Maria Marçal','F','Fé'],["Aquieta Minh'alma",'Ministério Zoe','G','Busca'],['Grandes Coisas','Fernandinho','E','Celebração'],['Teu Amor Não Falha','Nívea Soares','G','Adoração'],['Creio Que Tu És a Cura','Gabriela Rocha','A','Fé'],['Santo Pra Sempre','Gabriela Rocha','E','Adoração'],['Celebrai a Cristo','Aline Barros','D','Celebração'],['A Alegria Está no Coração','Harpa Cristã','G','Celebração'],['Deus Está Aqui','Quatro por Um','C','Adoração'],['Quero Conhecer Jesus','Projeto Sola','D','Busca'],['Eu Navegarei','Comunidade da Graça','E','Adoração'],['Vem Esta é a Hora','Diante do Trono','G','Adoração'],['Te Exaltamos Senhor','Toque no Altar','D','Celebração'],['Rei da Glória','Aline Barros','E','Celebração'],['Eu Me Rendo','Renascer Praise','C','Consagração'],['Mais Perto Quero Estar','Hino Cristão','G','Consagração'],['Porque Ele Vive','Hino Cristão','G','Fé'],['Grandioso És Tu','Hino Cristão','C','Adoração'],['Segura na Mão de Deus','Hino Cristão','G','Fé'],['Caminho no Deserto','Soraya Moraes','G','Fé'],['Jó','Midian Lima','D','Fé'],['Raridade','Anderson Freire','E','Fé'],['Ressuscita-me','Aline Barros','C','Fé'],['Me Leva Pra Casa','Israel Salazar','G','Busca'],['Com Muito Louvor','Cassiane','E','Pentecostal'],['Sabor de Mel','Damares','G','Fé'],['Deus Proverá','Gabriela Gomes','D','Fé'],['É Tudo Sobre Você','Morada','G','Adoração'],['Vem Me Buscar','Jefferson & Suellen','E','Busca'],['Maranata','Ministério Avivah','D','Avivamento'],['Eu Escolho Deus','Thalles Roberto','G','Consagração'],['Acalma o Meu Coração','Anderson Freire','C','Busca'],['Descansarei','Comunidade da Zona Sul','G','Fé'],['Tu És Fiel','Hino Cristão','D','Adoração'],['Em Teus Braços','Laura Souguellis','G','Adoração'],['Toda a Terra','Gabriela Rocha','E','Celebração'],['Estou Pegando Fogo','Theo Rubia','A','Avivamento']
@@ -265,12 +310,20 @@
     let songSearch = '';
     function cloneData(value){ return JSON.parse(JSON.stringify(value)); }
     function loadState(){ try { const saved=JSON.parse(window.localStorage.getItem(STORAGE_KEY)); return saved && saved.songs && saved.cults ? saved : cloneData(initialState); } catch(e){ return cloneData(initialState); } }
-    function saveState(){ try { window.localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch(e){ /* Alguns visualizadores de arquivos bloqueiam o armazenamento local. */ } }
+    function saveState(action='Atualização local'){ try { window.localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch(e){ /* Alguns visualizadores de arquivos bloqueiam o armazenamento local. */ } queueCloudSave(action); }
     function escapeHtml(value=''){ return String(value).replace(/[&<>"']/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m])); }
     function fmtDate(iso){ if(!iso) return '—'; const d=new Date(iso+'T12:00:00'); return new Intl.DateTimeFormat('pt-BR',{day:'2-digit',month:'2-digit',year:'numeric'}).format(d); }
     function dayParts(iso){ const d=new Date(iso+'T12:00:00'); return {day:new Intl.DateTimeFormat('pt-BR',{day:'2-digit'}).format(d),month:new Intl.DateTimeFormat('pt-BR',{month:'short'}).format(d).replace('.',''),weekday:new Intl.DateTimeFormat('pt-BR',{weekday:'short'}).format(d).replace('.','')}; }
     function getSong(id){ return state.songs.find(s=>s.id===id); }
     function getCult(id){ return state.cults.find(c=>c.id===id); }
+    function setConnection(label, online){ const dot=document.getElementById('connection-dot'), text=document.getElementById('connection-label'); if(dot) dot.style.background=online?'#2e9b72':'#b84a5c'; if(dot) dot.style.boxShadow=online?'0 0 0 4px #d9f2e6':'0 0 0 4px #f7dfe4'; if(text) text.textContent=label; }
+    function setAuthMessage(message, error=false){ const el=document.getElementById('auth-status'); if(el){el.textContent=message||'';el.style.color=error?'var(--danger)':'var(--deep-2)';} }
+    function openAuth(){ const modal=document.getElementById('auth-modal'), card=modal?.querySelector('.auth-card'); if(!modal)return; modal.classList.add('open'); modal.setAttribute('aria-hidden','false'); card?.classList.toggle('signed-in',!!currentUser); setAuthMessage(currentUser?`Conectado como ${currentUser.email||'usuário'}`:''); }
+    function closeAuth(){ const modal=document.getElementById('auth-modal'); if(modal){modal.classList.remove('open');modal.setAttribute('aria-hidden','true');} }
+    function updateAuthUI(){ const button=document.getElementById('auth-button'); if(button) button.textContent=currentUser?'Minha conta':'Entrar'; const card=document.querySelector('.auth-card'); if(card) card.classList.toggle('signed-in',!!currentUser); if(currentUser){setConnection('Sincronizado',true);} else {setConnection('Modo local',false);} }
+    async function syncFromCloud(){ if(!currentUser)return; try { const ref=doc(db,'appState','main'); const snap=await getDoc(ref); if(snap.exists() && snap.data().songs && snap.data().cults){ const backupKey=`${STORAGE_KEY}-backup-${Date.now()}`; window.localStorage.setItem(backupKey,JSON.stringify(state)); state={songs:snap.data().songs,cults:snap.data().cults,nextCultId:snap.data().nextCultId||state.nextCultId}; saveState('Sincronização inicial do Firebase'); showToast('Dados sincronizados com o Firebase.'); } else { await writeCloudState('Primeiro envio do repertório local'); showToast('Repertório local enviado para o Firebase.'); } } catch(error){ console.error(error); setConnection('Firebase indisponível',false); showToast('Login feito, mas o banco ainda não está liberado.'); } render(); }
+    function queueCloudSave(action){ if(!currentUser)return; clearTimeout(cloudSaveTimer); cloudSaveTimer=setTimeout(()=>writeCloudState(action),700); }
+    async function writeCloudState(action='Atualização'){ if(!currentUser)return; try { await setDoc(doc(db,'appState','main'),{songs:state.songs,cults:state.cults,nextCultId:state.nextCultId,updatedAt:serverTimestamp(),updatedBy:currentUser.uid},{merge:false}); await addDoc(collection(db,'auditLogs'),{action,userId:currentUser.uid,email:currentUser.email||'',createdAt:serverTimestamp()}); setConnection('Sincronizado',true); } catch(error){ console.error(error); setConnection('Falha ao salvar',false); showToast('Não foi possível salvar no Firebase.'); } }
     function showToast(msg){ const el=document.getElementById('toast'); el.textContent=msg; el.classList.add('show'); clearTimeout(window.__toast); window.__toast=setTimeout(()=>el.classList.remove('show'),2300); }
     function navigate(view, id=null){ if(view==='scale'){ const next=state.cults.filter(c=>c.date>='2026-09-21').sort((a,b)=>a.date.localeCompare(b.date))[0]||state.cults[0]; selectedCultId=next?.id; currentView='scale'; } else { currentView=view; if(view==='song-detail') selectedSongId=id; if(view==='cult-detail') selectedCultId=id; } render(); window.scrollTo({top:0,behavior:'smooth'}); }
     function navMarkup(){ return navItems.map(n=>`<button class="${currentView===n.id || (n.id==='cults'&&currentView==='cult-detail') || (n.id==='songs'&&currentView==='song-detail') ? 'active':''}" data-nav="${n.id}"><span class="nav-icon">${n.icon}</span>${n.label}</button>`).join(''); }
@@ -297,7 +350,14 @@
     function buildWhatsApp(c){ const songs=c.songs.map((id,i)=>{const s=getSong(id);return s?`${i+1}. ${s.title} — ${s.key}`:''}).filter(Boolean).join('\n')||'Nenhuma música definida'; const scale=c.scale.map(x=>`${x.role} — ${x.name}`).join('\n')||'Escala ainda não definida'; return `🎶 *Ministério de Louvor Casa do Oleiro*\n\n📅 ${c.type} — ${fmtDate(c.date)}\n⏰ Culto: ${c.time}\n🎤 Equipe chegar: ${c.arrival}\n🎼 Ensaio/passagem: ${c.rehearsal}\n\n*REPERTÓRIO*\n${songs}\n\n*ESCALA*\n${scale}\n\nQue Deus conduza nosso culto! 🙏`; }
     async function copyCult(c){ if(!c)return; try{await navigator.clipboard.writeText(buildWhatsApp(c));showToast('Mensagem copiada para o WhatsApp.');}catch(e){showToast('Não foi possível copiar automaticamente.');} }
     document.addEventListener('click',e=>{const nav=e.target.closest('[data-nav]'); if(nav) navigate(nav.dataset.nav);});
+    document.getElementById('auth-button')?.addEventListener('click',openAuth);
+    document.getElementById('auth-close')?.addEventListener('click',closeAuth);
+    document.getElementById('auth-modal')?.addEventListener('click',e=>{if(e.target.id==='auth-modal')closeAuth();});
+    document.getElementById('auth-form')?.addEventListener('submit',async e=>{e.preventDefault(); const email=document.getElementById('auth-email').value.trim(), password=document.getElementById('auth-password').value; setAuthMessage('Entrando...'); try { await signInWithEmailAndPassword(auth,email,password); setAuthMessage('Login realizado.'); closeAuth(); } catch(error){ console.error(error); setAuthMessage('Não foi possível entrar. Verifique o e-mail e a senha.',true); } });
+    document.getElementById('auth-create')?.addEventListener('click',async()=>{const email=document.getElementById('auth-email').value.trim(), password=document.getElementById('auth-password').value; if(!email||password.length<6){setAuthMessage('Informe um e-mail e uma senha com pelo menos 6 caracteres.',true);return;} setAuthMessage('Criando conta...'); try { await createUserWithEmailAndPassword(auth,email,password); setAuthMessage('Conta criada.'); closeAuth(); } catch(error){ console.error(error); setAuthMessage('Não foi possível criar a conta. Confirme se o login por e-mail está ativado no Firebase.',true); } });
+    document.getElementById('auth-logout')?.addEventListener('click',async()=>{await signOut(auth);closeAuth();showToast('Você saiu da conta.');});
     render();
+    onAuthStateChanged(auth,user=>{ currentUser=user; updateAuthUI(); if(user) syncFromCloud(); });
   </script>
 </body>
 </html>
