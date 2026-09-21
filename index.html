@@ -1,0 +1,303 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#153b3f" />
+  <meta name="description" content="Repertório, escalas, cultos e estudos do Ministério de Louvor Casa do Oleiro." />
+  <title>Ministério de Louvor Casa do Oleiro</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='18' fill='%23153b3f'/%3E%3Cpath d='M18 43V21l14-7 14 7v22M25 43V30h14v13' fill='none' stroke='%23f0c56b' stroke-width='5' stroke-linejoin='round'/%3E%3C/svg%3E" />
+  <style>
+    :root {
+      --ink: #2a1b20;
+      --muted: #786a6e;
+      --line: #eadde0;
+      --canvas: #f7f3f4;
+      --surface: #ffffff;
+      --deep: #54151f;
+      --deep-2: #8a283a;
+      --gold: #c16425;
+      --gold-soft: #fff0e3;
+      --mint: #f7dfe4;
+      --danger: #ae3f55;
+      --shadow: 0 18px 42px rgba(84, 21, 31, .12);
+      --radius: 22px;
+    }
+    * { box-sizing: border-box; }
+    html { min-width: 320px; background: var(--canvas); }
+    body { margin: 0; color: var(--ink); background: var(--canvas); font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; font-size: 16px; line-height: 1.5; }
+    button, input, select, textarea { font: inherit; }
+    button { cursor: pointer; }
+    a { color: inherit; }
+    .app-shell { min-height: 100vh; display: flex; }
+    .sidebar { width: 264px; min-height: 100vh; padding: 28px 18px; background: linear-gradient(180deg, #45101a 0%, var(--deep) 55%, #701f32 100%); color: #fff8f8; display: flex; flex-direction: column; position: sticky; top: 0; align-self: flex-start; box-shadow: 8px 0 30px rgba(84,21,31,.13); }
+    .brand { display: flex; gap: 12px; align-items: center; padding: 4px 8px 28px; }
+    .brand-mark { width: 42px; height: 42px; border-radius: 14px; display: grid; place-items: center; background: var(--gold); color: var(--deep); font-weight: 900; letter-spacing: -1px; }
+    .brand-mark.logo-mark { background: #fff; padding: 4px; overflow: hidden; box-shadow: 0 5px 16px rgba(0,0,0,.15); }
+    .brand-mark.logo-mark img { width: 100%; height: 100%; object-fit: contain; display: block; }
+    .brand h1 { font-size: 15px; line-height: 1.15; margin: 0; letter-spacing: -.2px; }
+    .brand p { color: #edc8ce; font-size: 11px; margin: 4px 0 0; }
+    .nav-title { color: #d89aa5; font-size: 11px; text-transform: uppercase; letter-spacing: .13em; padding: 12px 12px 7px; }
+    .nav { display: grid; gap: 5px; }
+    .nav button { border: 0; background: transparent; color: #f1dfe2; border-radius: 13px; padding: 12px; text-align: left; display: flex; align-items: center; gap: 11px; font-weight: 650; font-size: 14px; }
+    .nav button:hover, .nav button.active { color: #fff; background: rgba(255,255,255,.12); }
+    .nav-icon { width: 24px; text-align: center; font-size: 17px; }
+    .sidebar-spacer { flex: 1; }
+    .sidebar-note { border: 1px solid rgba(255,255,255,.16); border-radius: 17px; padding: 14px; color: #f0cbd0; font-size: 12px; line-height: 1.45; background: rgba(255,255,255,.05); }
+    .sidebar-note strong { display: block; color: #fff; margin-bottom: 4px; }
+    .content-wrap { min-width: 0; flex: 1; background: radial-gradient(circle at 96% 5%, rgba(216,154,165,.12), transparent 24%), var(--canvas); }
+    .topbar { height: 78px; background: rgba(255,250,251,.94); backdrop-filter: blur(14px); border-top: 4px solid var(--deep-2); border-bottom: 1px solid var(--line); box-shadow: 0 5px 20px rgba(84,21,31,.07); display: flex; align-items: center; justify-content: space-between; padding: 0 clamp(20px, 4vw, 55px); position: sticky; top: 0; z-index: 10; }
+    .topbar-title { display: grid; gap: 2px; }
+    .topbar-title strong { color: var(--deep); font-size: 14px; letter-spacing: -.01em; }
+    .topbar-title span { color: var(--muted); font-size: 11px; }
+    .mobile-brand { display: none; align-items: center; gap: 10px; font-weight: 800; }
+    .mobile-brand .brand-mark { width: 34px; height: 34px; border-radius: 11px; font-size: 13px; }
+    .topbar-right { display: flex; align-items: center; gap: 12px; }
+    .online-dot { width: 9px; height: 9px; border-radius: 50%; background: #b84a5c; box-shadow: 0 0 0 4px #f7dfe4; }
+    .topbar-label { color: var(--muted); font-size: 13px; }
+    main { max-width: 1350px; padding: 38px clamp(20px, 4vw, 55px) 80px; margin: 0 auto; }
+    .view-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 20px; margin-bottom: 25px; }
+    .eyebrow { color: #9a3f50; font-size: 12px; text-transform: uppercase; letter-spacing: .14em; font-weight: 800; margin: 0 0 7px; }
+    h2, h3, p { margin-top: 0; }
+    h2 { font-size: clamp(27px, 3vw, 38px); line-height: 1.08; letter-spacing: -.04em; margin-bottom: 8px; }
+    h3 { font-size: 19px; letter-spacing: -.02em; margin-bottom: 4px; }
+    .subtle { color: var(--muted); }
+    .section-title { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin: 32px 0 15px; }
+    .section-title h3 { margin: 0; }
+    .section-title a, .text-button { color: var(--deep-2); font-size: 13px; font-weight: 750; border: 0; background: none; padding: 5px; }
+    .btn { border: 1px solid transparent; border-radius: 13px; padding: 11px 15px; font-size: 14px; font-weight: 800; display: inline-flex; align-items: center; justify-content: center; gap: 7px; transition: transform .15s, box-shadow .15s, background .15s; }
+    .btn:hover { transform: translateY(-1px); }
+    .btn-primary { background: var(--deep); color: #fff; box-shadow: 0 8px 20px rgba(84,21,31,.22); }
+    .btn-primary:hover { background: var(--deep-2); }
+    .btn-gold { background: var(--gold); color: var(--deep); }
+    .btn-soft { background: var(--mint); color: var(--deep); }
+    .btn-ghost { background: #fff; border-color: var(--line); color: var(--ink); }
+    .btn-danger { background: #fff3f2; border-color: #f1d5d3; color: var(--danger); }
+    .btn-sm { padding: 8px 10px; font-size: 12px; border-radius: 10px; }
+    .card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow); }
+    .hero-grid { display: grid; grid-template-columns: 1.35fr .65fr; gap: 18px; }
+    .next-card { padding: 28px; color: #fff; background: radial-gradient(circle at 92% 4%, rgba(237,191,106,.38), transparent 27%), linear-gradient(135deg, #45101a 0%, #8b293d 100%); border: 0; position: relative; overflow: hidden; box-shadow: 0 22px 45px rgba(84,21,31,.23); }
+    .next-card:before { content: ""; position: absolute; width: 230px; height: 230px; right: -78px; top: -115px; border: 1px solid rgba(255,255,255,.22); border-radius: 50%; box-shadow: 0 0 0 22px rgba(255,255,255,.035), 0 0 0 44px rgba(255,255,255,.025); }
+    .next-card:after { content: "♫"; position: absolute; right: 28px; bottom: -18px; font-size: 150px; line-height: 1; color: rgba(255,255,255,.1); transform: rotate(-13deg); }
+    .next-card .eyebrow { color: #f0cbd0; }
+    .next-card h2 { max-width: 470px; margin-bottom: 16px; }
+    .next-meta { display: flex; flex-wrap: wrap; gap: 12px 20px; margin: 20px 0 24px; position: relative; z-index: 1; }
+    .next-meta-item { display: grid; gap: 2px; font-size: 13px; color: #efd7da; }
+    .next-meta-item strong { font-size: 15px; color: #fff; }
+    .next-card .btn { position: relative; z-index: 1; }
+    .quick-card { padding: 24px; border-top: 4px solid var(--deep-2); }
+    .quick-card h3 { margin-bottom: 16px; }
+    .quick-list { display: grid; gap: 10px; }
+    .quick-link { border: 1px solid var(--line); border-radius: 14px; background: #fffbfb; padding: 13px; display: flex; align-items: center; gap: 12px; text-align: left; color: var(--ink); }
+    .quick-link:hover { border-color: #d89aa5; background: #fff4f5; }
+    .quick-link span:first-child { width: 32px; height: 32px; display: grid; place-items: center; border-radius: 11px; background: var(--gold-soft); }
+    .quick-link strong { font-size: 13px; display: block; }
+    .quick-link small { color: var(--muted); font-size: 12px; }
+    .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-top: 18px; }
+    .stat { padding: 18px; }
+    .stat strong { display: block; font-size: 27px; letter-spacing: -.04em; }
+    .stat span { color: var(--muted); font-size: 12px; }
+    .schedule-grid { display: grid; grid-template-columns: 1.1fr .9fr; gap: 18px; }
+    .list-card { padding: 6px; }
+    .event-row { display: flex; align-items: center; gap: 14px; padding: 16px; border-bottom: 1px solid var(--line); }
+    .event-row:last-child { border-bottom: 0; }
+    .date-chip { min-width: 48px; height: 53px; background: var(--gold-soft); border-radius: 14px; display: grid; place-items: center; align-content: center; color: var(--deep); box-shadow: inset 0 0 0 1px rgba(237,191,106,.32); }
+    .date-chip strong { font-size: 19px; line-height: 1; }
+    .date-chip small { font-size: 10px; text-transform: uppercase; font-weight: 800; }
+    .event-copy { min-width: 0; flex: 1; }
+    .event-copy strong { display: block; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .event-copy span { display: block; font-size: 12px; color: var(--muted); }
+    .status { display: inline-flex; align-items: center; gap: 6px; border-radius: 999px; background: #eef5f1; color: #396b55; padding: 5px 9px; font-size: 11px; font-weight: 800; white-space: nowrap; }
+    .status:before { content: ""; width: 6px; height: 6px; background: currentColor; border-radius: 50%; }
+    .status.study { color: #9b7018; background: var(--gold-soft); }
+    .status.archive { color: #697779; background: #eef1f1; }
+    .song-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+    .song-card { padding: 18px; display: flex; flex-direction: column; min-height: 210px; }
+    .song-card:hover { border-color: #d89aa5; box-shadow: 0 20px 44px rgba(84,21,31,.16); }
+    .song-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }
+    .song-title { font-size: 16px; font-weight: 850; line-height: 1.2; margin-bottom: 5px; }
+    .song-artist { font-size: 12px; color: var(--muted); }
+    .key-badge { min-width: 35px; height: 35px; border-radius: 11px; background: var(--gold-soft); color: #7e5e17; display: grid; place-items: center; font-weight: 900; font-size: 14px; }
+    .chip-row { display: flex; flex-wrap: wrap; gap: 6px; margin: 13px 0; }
+    .chip { border-radius: 999px; padding: 5px 9px; background: #edf5f2; color: #426d64; font-size: 11px; font-weight: 750; }
+    .song-footer { margin-top: auto; display: flex; flex-wrap: wrap; gap: 6px; }
+    .song-footer .btn { flex: 1; min-width: 57px; }
+    .toolbar { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 17px; }
+    .search-box { position: relative; flex: 1 1 260px; }
+    .search-box input { width: 100%; border: 1px solid var(--line); border-radius: 13px; background: #fff; padding: 12px 14px 12px 39px; outline: none; }
+    .search-box input:focus, input:focus, select:focus, textarea:focus { border-color: #c26677; box-shadow: 0 0 0 3px rgba(194,102,119,.16); }
+    .search-box span { position: absolute; left: 13px; top: 10px; color: var(--muted); }
+    .filter-row { display: flex; gap: 7px; overflow-x: auto; padding-bottom: 4px; margin-bottom: 20px; scrollbar-width: thin; }
+    .filter { border: 1px solid var(--line); color: var(--muted); background: #fff; padding: 8px 11px; border-radius: 999px; font-size: 12px; white-space: nowrap; font-weight: 750; }
+    .filter.active { color: var(--deep); background: var(--mint); border-color: #dfabb5; }
+    .empty { padding: 45px 20px; text-align: center; color: var(--muted); }
+    .detail-head { display: flex; align-items: flex-start; gap: 15px; margin-bottom: 22px; }
+    .back { border: 1px solid var(--line); background: #fff; border-radius: 12px; padding: 9px 12px; color: var(--muted); }
+    .detail-title { flex: 1; }
+    .detail-title h2 { margin-bottom: 8px; }
+    .detail-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+    .detail-grid { display: grid; grid-template-columns: 1.1fr .9fr; gap: 18px; }
+    .panel { padding: 22px; }
+    .panel h3 { margin-bottom: 16px; }
+    .reference { border: 1px solid var(--line); border-radius: 15px; padding: 14px; display: flex; align-items: flex-start; gap: 12px; margin-bottom: 10px; }
+    .reference:last-child { margin-bottom: 0; }
+    .reference-icon { width: 33px; height: 33px; display: grid; place-items: center; border-radius: 10px; background: var(--mint); }
+    .reference strong { display: block; font-size: 14px; }
+    .reference p { margin: 3px 0 0; color: var(--muted); font-size: 12px; }
+    .reference .btn { margin-left: auto; }
+    pre.chords { margin: 0; white-space: pre-wrap; background: #f3f7f5; border: 1px solid var(--line); border-radius: 15px; padding: 16px; min-height: 150px; color: #315b54; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 13px; line-height: 1.65; }
+    .note-box { border-left: 4px solid var(--gold); padding: 7px 0 7px 14px; color: #526563; }
+    .form-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 15px; }
+    .field { display: grid; gap: 6px; }
+    .field.full { grid-column: 1 / -1; }
+    .field label { font-size: 12px; font-weight: 800; color: #4e6261; }
+    .field input, .field select, .field textarea { width: 100%; border: 1px solid var(--line); border-radius: 12px; padding: 11px 12px; background: #fbfdfc; color: var(--ink); outline: none; }
+    .field textarea { min-height: 112px; resize: vertical; }
+    .form-actions { display: flex; justify-content: flex-end; gap: 9px; margin-top: 20px; }
+    .cult-grid { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 15px; }
+    .cult-card { padding: 19px; }
+    .cult-card-head { display: flex; gap: 13px; align-items: center; }
+    .cult-card-head .date-chip { min-width: 56px; }
+    .cult-card h3 { font-size: 17px; margin: 0 0 3px; }
+    .cult-card .meta { font-size: 12px; color: var(--muted); }
+    .cult-card .chip-row { margin: 15px 0 12px; }
+    .cult-card-actions { display: flex; gap: 8px; }
+    .cult-layout { display: grid; grid-template-columns: 1.12fr .88fr; gap: 18px; align-items: start; }
+    .cult-summary { padding: 22px; color: #fff; background: linear-gradient(135deg, var(--deep), #255f5e); }
+    .cult-summary h2 { margin-bottom: 6px; }
+    .cult-summary p { color: #cde0da; margin-bottom: 18px; }
+    .summary-meta { display: flex; flex-wrap: wrap; gap: 13px 20px; }
+    .summary-meta span { color: #cde0da; font-size: 12px; }
+    .summary-meta strong { display: block; color: white; font-size: 14px; }
+    .repertoire-list { display: grid; gap: 10px; }
+    .repertoire-item { border: 1px solid var(--line); border-radius: 16px; padding: 13px; display: grid; gap: 11px; }
+    .repertoire-main { display: flex; gap: 10px; align-items: center; }
+    .number { width: 28px; height: 28px; border-radius: 9px; background: var(--gold-soft); color: #88691f; display: grid; place-items: center; font-weight: 900; font-size: 13px; }
+    .repertoire-main > div { min-width: 0; flex: 1; }
+    .repertoire-main strong { display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .repertoire-main small { color: var(--muted); }
+    .repertoire-actions { display: flex; gap: 6px; flex-wrap: wrap; }
+    .assignment-grid { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 7px; }
+    .assignment-grid input { width: 100%; min-width: 0; border: 1px solid var(--line); border-radius: 9px; padding: 8px; font-size: 11px; }
+    .scale-list { display: grid; gap: 9px; margin-bottom: 17px; }
+    .scale-row { display: flex; align-items: center; gap: 10px; border: 1px solid var(--line); border-radius: 13px; padding: 11px; }
+    .scale-avatar { width: 32px; height: 32px; border-radius: 50%; background: var(--mint); color: var(--deep); display: grid; place-items: center; font-weight: 900; font-size: 12px; }
+    .scale-row > div:nth-child(2) { flex: 1; min-width: 0; }
+    .scale-row strong { display: block; font-size: 13px; }
+    .scale-row small { color: var(--muted); font-size: 11px; }
+    .presence { border: 0; border-radius: 999px; padding: 5px 8px; font-size: 10px; font-weight: 850; background: #eef5f1; color: #397258; }
+    .presence.wait { background: var(--gold-soft); color: #927019; }
+    .presence.no { background: #fff0ef; color: var(--danger); }
+    .add-row { display: flex; gap: 7px; }
+    .add-row select, .add-row input { flex: 1; min-width: 0; border: 1px solid var(--line); border-radius: 11px; padding: 10px; background: #fff; }
+    .copy-box { background: #f3f8f5; border: 1px dashed #b8d4c9; border-radius: 16px; padding: 15px; font-family: ui-monospace, monospace; font-size: 12px; white-space: pre-wrap; color: #3b5b53; max-height: 260px; overflow: auto; }
+    .mobile-nav { display: none; }
+    .toast { position: fixed; left: 50%; bottom: 28px; transform: translate(-50%, 20px); background: var(--deep); color: white; border-radius: 999px; padding: 11px 16px; font-size: 13px; font-weight: 750; opacity: 0; pointer-events: none; transition: .2s; z-index: 50; box-shadow: 0 10px 30px rgba(0,0,0,.2); }
+    .toast.show { opacity: 1; transform: translate(-50%, 0); }
+    @media (max-width: 1050px) { .song-grid { grid-template-columns: repeat(2, minmax(0,1fr)); } .hero-grid, .schedule-grid, .detail-grid, .cult-layout { grid-template-columns: 1fr; } }
+    @media (max-width: 760px) {
+      body { padding-bottom: 75px; }
+      .sidebar { display: none; }
+      .topbar { height: 66px; padding: 0 17px; }
+      .mobile-brand { display: flex; }
+      .topbar-title { display: none; }
+      .topbar-label { display: none; }
+      main { padding: 27px 16px 45px; }
+      .view-head { align-items: flex-start; flex-direction: column; gap: 14px; margin-bottom: 20px; }
+      .view-head .btn { width: 100%; }
+      h2 { font-size: 29px; }
+      .next-card, .quick-card { padding: 20px; }
+      .stats { grid-template-columns: repeat(2, 1fr); }
+      .song-grid, .cult-grid { grid-template-columns: 1fr; }
+      .song-card { min-height: 190px; }
+      .detail-head { flex-wrap: wrap; }
+      .detail-head .back { order: -1; }
+      .detail-actions { width: 100%; }
+      .detail-actions .btn { flex: 1; }
+      .form-grid { grid-template-columns: 1fr; }
+      .field.full { grid-column: auto; }
+      .assignment-grid { grid-template-columns: 1fr; }
+      .mobile-nav { position: fixed; display: grid; grid-template-columns: repeat(5, 1fr); bottom: 0; left: 0; right: 0; height: 68px; background: rgba(255,255,255,.96); border-top: 1px solid var(--line); z-index: 20; box-shadow: 0 -5px 20px rgba(15,55,52,.08); }
+      .mobile-nav button { border: 0; background: transparent; color: var(--muted); display: grid; place-items: center; align-content: center; gap: 2px; font-size: 10px; font-weight: 750; }
+      .mobile-nav button.active { color: var(--deep); }
+      .mobile-nav span:first-child { font-size: 19px; line-height: 1; }
+      .event-row { padding: 13px 9px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="brand"><div class="brand-mark logo-mark"><img src="logo-casa-do-oleiro.png" alt="Logo Casa do Oleiro" /></div><div><h1>Ministério de Louvor<br/>Casa do Oleiro</h1><p>Repertório • Escalas • Cultos</p></div></div>
+      <div class="nav-title">Menu principal</div>
+      <nav class="nav" id="side-nav"></nav>
+      <div class="sidebar-spacer"></div>
+      <div class="sidebar-note"><strong>Primeira versão</strong>Os dados ficam salvos neste navegador enquanto testamos o sistema com a equipe.</div>
+    </aside>
+    <div class="content-wrap">
+      <header class="topbar"><div class="mobile-brand"><div class="brand-mark logo-mark"><img src="logo-casa-do-oleiro.png" alt="Logo Casa do Oleiro" /></div><span>Casa do Oleiro</span></div><div class="topbar-title"><strong>Ministério de Louvor Casa do Oleiro</strong><span>Repertório • Escalas • Cultos • Estudos</span></div><div class="topbar-right"><span class="online-dot"></span><span class="topbar-label">Modo de teste local</span></div></header>
+      <main id="app"></main>
+    </div>
+  </div>
+  <nav class="mobile-nav" id="mobile-nav"></nav>
+  <div class="toast" id="toast"></div>
+  <script>
+    const STORAGE_KEY = 'casa-do-oleiro-louvor-v1';
+    const songNames = [
+      ['Ruja o Leão','Isaias Saad','G','Celebração'],['A Vitória Chegou','Aurelina Dourado','D','Celebração'],['Deus de Promessas','Toque no Altar','G','Fé'],['Lugar Secreto','Gabriela Rocha','E','Adoração'],['Bondade de Deus','Isaías Saad','G','Adoração'],['Ninguém Explica Deus','Preto no Branco','A','Fé'],['Algo Novo','Kemuel','D','Avivamento'],['Ousado Amor','Isaías Saad','G','Adoração'],['Santo Espírito','Laura Souguellis','C','Adoração'],['Jeová Jireh','Aline Barros','D','Fé'],['A Casa é Sua','Casa Worship','D','Consagração'],['Todavia Me Alegrarei','Samuel Messias','C','Fé'],['Ele Vem','Gabriela Rocha','E','Avivamento'],['Deserto','Maria Marçal','F','Fé'],["Aquieta Minh'alma",'Ministério Zoe','G','Busca'],['Grandes Coisas','Fernandinho','E','Celebração'],['Teu Amor Não Falha','Nívea Soares','G','Adoração'],['Creio Que Tu És a Cura','Gabriela Rocha','A','Fé'],['Santo Pra Sempre','Gabriela Rocha','E','Adoração'],['Celebrai a Cristo','Aline Barros','D','Celebração'],['A Alegria Está no Coração','Harpa Cristã','G','Celebração'],['Deus Está Aqui','Quatro por Um','C','Adoração'],['Quero Conhecer Jesus','Projeto Sola','D','Busca'],['Eu Navegarei','Comunidade da Graça','E','Adoração'],['Vem Esta é a Hora','Diante do Trono','G','Adoração'],['Te Exaltamos Senhor','Toque no Altar','D','Celebração'],['Rei da Glória','Aline Barros','E','Celebração'],['Eu Me Rendo','Renascer Praise','C','Consagração'],['Mais Perto Quero Estar','Hino Cristão','G','Consagração'],['Porque Ele Vive','Hino Cristão','G','Fé'],['Grandioso És Tu','Hino Cristão','C','Adoração'],['Segura na Mão de Deus','Hino Cristão','G','Fé'],['Caminho no Deserto','Soraya Moraes','G','Fé'],['Jó','Midian Lima','D','Fé'],['Raridade','Anderson Freire','E','Fé'],['Ressuscita-me','Aline Barros','C','Fé'],['Me Leva Pra Casa','Israel Salazar','G','Busca'],['Com Muito Louvor','Cassiane','E','Pentecostal'],['Sabor de Mel','Damares','G','Fé'],['Deus Proverá','Gabriela Gomes','D','Fé'],['É Tudo Sobre Você','Morada','G','Adoração'],['Vem Me Buscar','Jefferson & Suellen','E','Busca'],['Maranata','Ministério Avivah','D','Avivamento'],['Eu Escolho Deus','Thalles Roberto','G','Consagração'],['Acalma o Meu Coração','Anderson Freire','C','Busca'],['Descansarei','Comunidade da Zona Sul','G','Fé'],['Tu És Fiel','Hino Cristão','D','Adoração'],['Em Teus Braços','Laura Souguellis','G','Adoração'],['Toda a Terra','Gabriela Rocha','E','Celebração'],['Estou Pegando Fogo','Theo Rubia','A','Avivamento']
+    ];
+    const categories = ['Celebração','Adoração','Fé','Busca','Consagração','Intercessão','Avivamento','Ceia','Gratidão','Comunhão','Pentecostal','Palavra / Reflexão','Encerramento','Oferta','Clamor'];
+    const roles = ['Ministro de louvor','Vocal','Backing vocal','Teclado','Violão','Guitarra','Contrabaixo','Bateria','Percussão','Sax / instrumento adicional','Técnico de som','Projeção / multimídia'];
+    const navItems = [{id:'dashboard',icon:'⌂',label:'Início'},{id:'songs',icon:'♫',label:'Repertório'},{id:'cults',icon:'▣',label:'Cultos'},{id:'scale',icon:'♬',label:'Escala'},{id:'song-form',icon:'＋',label:'Adicionar'}];
+    const makeUrl = (kind, title, artist='') => kind === 'video' ? 'https://www.youtube.com/results?search_query=' + encodeURIComponent(title+' '+artist) : kind === 'audio' ? 'https://open.spotify.com/search/' + encodeURIComponent(title+' '+artist) : 'https://www.google.com/search?q=' + encodeURIComponent(title+' cifra');
+    const makeSongs = () => songNames.map((item, i) => ({ id:'song-'+(i+1), title:item[0], artist:item[1], key:item[2], originalKey:item[2], category:item[3], status:i < 42 ? 'Ativa' : 'Em estudo', video:makeUrl('video',item[0],item[1]), audio:makeUrl('audio',item[0],item[1]), chord:makeUrl('chord',item[0],item[1]), ministryChord:i < 8 ? 'Intro:  ' + item[2] + '  -  D  -  Em  -  C\n\nVerso:\nA definir com a equipe.\n\nRefrão:\nAcompanhar a versão principal.' : '', notes:i % 7 === 0 ? 'Seguir a versão do vídeo. Ajustar a dinâmica no último refrão.' : '', usedCount:Math.max(1, 12 - Math.floor(i/5)), lastUsed:i < 10 ? '20/09/2026' : '—', refs:[] }));
+    const seedCults = [
+      {id:'cult-1', type:'Domingo', title:'Culto de Celebração', date:'2026-09-27', time:'18:30', arrival:'17:30', rehearsal:'16:30', location:'Ministério Casa do Oleiro', notes:'Chegar com instrumentos afinados e revisar as entradas.', status:'Preparando', songs:['song-5','song-7','song-19','song-13','song-3'], scale:[{role:'Ministro de louvor',name:'Marcos',presence:'Confirmado'},{role:'Vocal',name:'Graciele',presence:'Confirmado'},{role:'Backing vocal',name:'Isadora',presence:'Aguardando'},{role:'Guitarra',name:'Edson',presence:'Confirmado'},{role:'Contrabaixo',name:'Erick',presence:'Confirmado'},{role:'Bateria',name:'Natan',presence:'Aguardando'},{role:'Técnico de som',name:'Marcos',presence:'Confirmado'}], assignments:{'song-5':{minister:'Marcos',vocal:'Graciele',backing:'Isadora',note:''},'song-7':{minister:'Marcos',vocal:'Graciele',backing:'',note:''}}},
+      {id:'cult-2', type:'Quinta', title:'Escola Bíblica', date:'2026-09-24', time:'19:30', arrival:'18:45', rehearsal:'18:30', location:'Ministério Casa do Oleiro', notes:'', status:'Repertório definido', songs:['song-9','song-15','song-44'], scale:[{role:'Ministro de louvor',name:'Marcos',presence:'Confirmado'},{role:'Teclado',name:'A definir',presence:'Aguardando'},{role:'Técnico de som',name:'Marcos',presence:'Confirmado'}],assignments:{}},
+      {id:'cult-3', type:'Domingo', title:'Culto de Celebração', date:'2026-09-20', time:'18:30', arrival:'17:30', rehearsal:'16:30', location:'Ministério Casa do Oleiro', notes:'', status:'Finalizado', songs:['song-1','song-5','song-35','song-19'], scale:[{role:'Ministro de louvor',name:'Marcos',presence:'Confirmado'},{role:'Vocal',name:'Graciele',presence:'Confirmado'},{role:'Violão',name:'Marcos',presence:'Confirmado'},{role:'Bateria',name:'Natan',presence:'Confirmado'}],assignments:{},history:true}
+    ];
+    const initialState = {songs:makeSongs(), cults:seedCults, nextCultId:4};
+    let state = loadState();
+    let currentView = 'dashboard';
+    let selectedSongId = null;
+    let selectedCultId = null;
+    let songFilter = 'Todas';
+    let songSearch = '';
+    function cloneData(value){ return JSON.parse(JSON.stringify(value)); }
+    function loadState(){ try { const saved=JSON.parse(window.localStorage.getItem(STORAGE_KEY)); return saved && saved.songs && saved.cults ? saved : cloneData(initialState); } catch(e){ return cloneData(initialState); } }
+    function saveState(){ try { window.localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch(e){ /* Alguns visualizadores de arquivos bloqueiam o armazenamento local. */ } }
+    function escapeHtml(value=''){ return String(value).replace(/[&<>"']/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m])); }
+    function fmtDate(iso){ if(!iso) return '—'; const d=new Date(iso+'T12:00:00'); return new Intl.DateTimeFormat('pt-BR',{day:'2-digit',month:'2-digit',year:'numeric'}).format(d); }
+    function dayParts(iso){ const d=new Date(iso+'T12:00:00'); return {day:new Intl.DateTimeFormat('pt-BR',{day:'2-digit'}).format(d),month:new Intl.DateTimeFormat('pt-BR',{month:'short'}).format(d).replace('.',''),weekday:new Intl.DateTimeFormat('pt-BR',{weekday:'short'}).format(d).replace('.','')}; }
+    function getSong(id){ return state.songs.find(s=>s.id===id); }
+    function getCult(id){ return state.cults.find(c=>c.id===id); }
+    function showToast(msg){ const el=document.getElementById('toast'); el.textContent=msg; el.classList.add('show'); clearTimeout(window.__toast); window.__toast=setTimeout(()=>el.classList.remove('show'),2300); }
+    function navigate(view, id=null){ if(view==='scale'){ const next=state.cults.filter(c=>c.date>='2026-09-21').sort((a,b)=>a.date.localeCompare(b.date))[0]||state.cults[0]; selectedCultId=next?.id; currentView='scale'; } else { currentView=view; if(view==='song-detail') selectedSongId=id; if(view==='cult-detail') selectedCultId=id; } render(); window.scrollTo({top:0,behavior:'smooth'}); }
+    function navMarkup(){ return navItems.map(n=>`<button class="${currentView===n.id || (n.id==='cults'&&currentView==='cult-detail') || (n.id==='songs'&&currentView==='song-detail') ? 'active':''}" data-nav="${n.id}"><span class="nav-icon">${n.icon}</span>${n.label}</button>`).join(''); }
+    function renderNav(){ document.getElementById('side-nav').innerHTML=navMarkup(); document.getElementById('mobile-nav').innerHTML=navItems.map(n=>`<button class="${currentView===n.id || (n.id==='cults'&&currentView==='cult-detail') || (n.id==='songs'&&currentView==='song-detail') ? 'active':''}" data-nav="${n.id}"><span>${n.icon}</span>${n.label}</button>`).join(''); document.querySelectorAll('[data-nav]').forEach(b=>b.onclick=()=>navigate(b.dataset.nav)); }
+    function render(){ renderNav(); const app=document.getElementById('app'); const views={dashboard:renderDashboard,songs:renderSongs,'song-detail':renderSongDetail,'song-form':renderSongForm,cults:renderCults,'cult-detail':renderCultDetail,scale:renderCultDetail,history:renderHistory}; app.innerHTML=(views[currentView]||renderDashboard)(); bindView(); }
+    function renderDashboard(){ const next=state.cults.filter(c=>c.date>='2026-09-21').sort((a,b)=>a.date.localeCompare(b.date))[0]||state.cults[0]; const parts=dayParts(next.date); const active=state.songs.filter(s=>s.status==='Ativa').length; const studies=state.songs.filter(s=>s.status==='Em estudo').length; return `<div class="view-head"><div><p class="eyebrow">Bom trabalho, equipe</p><h2>Vamos preparar o próximo culto?</h2><p class="subtle">Tudo o que o Ministério precisa para estudar, ensaiar e servir com excelência.</p></div><button class="btn btn-primary" data-action="new-cult">＋ Novo culto</button></div><div class="hero-grid"><section class="card next-card"><p class="eyebrow">Próximo compromisso</p><h2>${escapeHtml(next.type)} — ${escapeHtml(next.title)}</h2><p>${fmtDate(next.date)} • ${next.time} • ${escapeHtml(next.location||'Local a definir')}</p><div class="next-meta"><div class="next-meta-item"><span>Equipe chegar</span><strong>${next.arrival}</strong></div><div class="next-meta-item"><span>Ensaio / passagem</span><strong>${next.rehearsal}</strong></div><div class="next-meta-item"><span>Repertório</span><strong>${next.songs.length} músicas</strong></div><div class="next-meta-item"><span>Escala</span><strong>${next.scale.filter(s=>s.presence==='Confirmado').length} confirmados</strong></div></div><button class="btn btn-gold" data-action="open-cult" data-id="${next.id}">Abrir preparação do culto →</button></section><section class="card quick-card"><h3>Atalhos rápidos</h3><div class="quick-list"><button class="quick-link" data-action="new-song"><span>＋</span><div><strong>Adicionar música</strong><small>Cadastre vídeo, cifra e tom</small></div></button><button class="quick-link" data-action="open-songs"><span>♫</span><div><strong>Estudar repertório</strong><small>${active} músicas ativas na biblioteca</small></div></button><button class="quick-link" data-action="open-history"><span>◷</span><div><strong>Ver histórico</strong><small>Consulte os cultos anteriores</small></div></button></div></section></div><div class="stats"><div class="card stat"><strong>${state.songs.length}</strong><span>Músicas cadastradas</span></div><div class="card stat"><strong>${active}</strong><span>Repertório oficial</span></div><div class="card stat"><strong>${studies}</strong><span>Em estudo</span></div><div class="card stat"><strong>${state.cults.length}</strong><span>Cultos registrados</span></div></div><div class="schedule-grid"><section><div class="section-title"><h3>Próximos compromissos</h3><button class="text-button" data-action="open-cults">Ver todos →</button></div><div class="card list-card">${state.cults.filter(c=>c.date>='2026-09-21').sort((a,b)=>a.date.localeCompare(b.date)).slice(0,4).map(c=>eventRow(c)).join('')||'<div class="empty">Nenhum compromisso cadastrado.</div>'}</div></section><section><div class="section-title"><h3>Repertório rápido</h3><button class="text-button" data-action="open-songs">Biblioteca →</button></div><div class="card list-card">${state.songs.slice(0,4).map(s=>`<div class="event-row"><div class="key-badge">${escapeHtml(s.key)}</div><div class="event-copy"><strong>${escapeHtml(s.title)}</strong><span>${escapeHtml(s.artist)} • ${escapeHtml(s.category)}</span></div><button class="btn btn-sm btn-ghost" data-action="open-song" data-id="${s.id}">Abrir</button></div>`).join('')}</div></section></div>`; }
+    function eventRow(c){ const p=dayParts(c.date); return `<div class="event-row"><div class="date-chip"><strong>${p.day}</strong><small>${p.month}</small></div><div class="event-copy"><strong>${escapeHtml(c.type)} — ${escapeHtml(c.title)}</strong><span>${c.time} • ${c.songs.length} músicas • ${escapeHtml(c.status)}</span></div><button class="btn btn-sm btn-ghost" data-action="open-cult" data-id="${c.id}">Abrir</button></div>`; }
+    function filteredSongs(){ return state.songs.filter(s=>{ const q=songSearch.toLowerCase(); const matches=!q || [s.title,s.artist,s.category,s.key,s.originalKey].some(x=>String(x||'').toLowerCase().includes(q)); const category=songFilter==='Todas'||songFilter==='Mais utilizadas'||s.category===songFilter||(songFilter==='Em estudo'&&s.status==='Em estudo'); return matches&&category; }).sort((a,b)=>songFilter==='Mais utilizadas'?b.usedCount-a.usedCount:a.title.localeCompare(b.title)); }
+    function renderSongs(){ const songs=filteredSongs(); const filters=['Todas','Celebração','Adoração','Fé','Busca','Intercessão','Ceia','Em estudo','Mais utilizadas']; return `<div class="view-head"><div><p class="eyebrow">Biblioteca de músicas</p><h2>Repertório</h2><p class="subtle">Encontre a versão certa, o tom da equipe e os materiais de estudo.</p></div><button class="btn btn-primary" data-action="new-song">＋ Adicionar música</button></div><div class="toolbar"><div class="search-box"><span>⌕</span><input id="song-search" value="${escapeHtml(songSearch)}" placeholder="Buscar por música, cantor, categoria ou tom..." /></div><button class="btn btn-ghost" data-action="reset-filters">Limpar filtros</button></div><div class="filter-row">${filters.map(f=>`<button class="filter ${songFilter===f?'active':''}" data-filter="${escapeHtml(f)}">${f}</button>`).join('')}</div>${songs.length?`<div class="song-grid">${songs.map(songCard).join('')}</div>`:'<div class="card empty">Nenhuma música encontrada. Tente outro termo ou cadastre uma nova.</div>'}`; }
+    function songCard(s){ return `<article class="card song-card"><div class="song-top"><div><div class="song-title">${escapeHtml(s.title)}</div><div class="song-artist">${escapeHtml(s.artist)}</div></div><div class="key-badge">${escapeHtml(s.key)}</div></div><div class="chip-row"><span class="chip">${escapeHtml(s.category)}</span><span class="status ${s.status==='Em estudo'?'study':''}">${escapeHtml(s.status)}</span></div><div class="subtle" style="font-size:12px;margin-bottom:13px;">Usada ${s.usedCount}x • Última: ${escapeHtml(s.lastUsed)}</div><div class="song-footer"><button class="btn btn-sm btn-soft" data-action="play" data-id="${s.id}">▶ Ouvir</button><button class="btn btn-sm btn-ghost" data-action="video" data-id="${s.id}">Vídeo</button><button class="btn btn-sm btn-ghost" data-action="chord" data-id="${s.id}">Cifra</button><button class="btn btn-sm btn-primary" data-action="open-song" data-id="${s.id}">Detalhes</button></div></article>`; }
+    function renderSongDetail(){ const s=getSong(selectedSongId)||state.songs[0]; return `<div class="detail-head"><button class="back" data-action="open-songs">← Voltar</button><div class="detail-title"><p class="eyebrow">Estudo da música</p><h2>${escapeHtml(s.title)}</h2><p class="subtle">${escapeHtml(s.artist)} • Tom da Casa do Oleiro: <strong>${escapeHtml(s.key)}</strong> • Tom original: ${escapeHtml(s.originalKey||'—')}</p><div class="chip-row"><span class="chip">${escapeHtml(s.category)}</span><span class="status ${s.status==='Em estudo'?'study':''}">${escapeHtml(s.status)}</span></div></div><div class="detail-actions"><button class="btn btn-soft" data-action="play" data-id="${s.id}">▶ Ouvir</button><button class="btn btn-ghost" data-action="video" data-id="${s.id}">Vídeo</button><button class="btn btn-ghost" data-action="chord" data-id="${s.id}">Cifra</button><button class="btn btn-primary" data-action="edit-song" data-id="${s.id}">Editar</button></div></div><div class="detail-grid"><section class="card panel"><h3>Referências</h3><div class="reference"><div class="reference-icon">▶</div><div><strong>Versão principal</strong><p>Usar arranjo e dinâmica desta referência.</p></div><button class="btn btn-sm btn-ghost" data-action="video" data-id="${s.id}">Abrir</button></div><div class="reference"><div class="reference-icon">♫</div><div><strong>Áudio para estudo</strong><p>Ouvir durante a semana e revisar entradas.</p></div><button class="btn btn-sm btn-ghost" data-action="audio" data-id="${s.id}">Ouvir</button></div><div class="reference"><div class="reference-icon">🎸</div><div><strong>Cifra externa</strong><p>Conferir acordes e adaptar para o tom da equipe.</p></div><button class="btn btn-sm btn-ghost" data-action="chord" data-id="${s.id}">Abrir</button></div></section><section class="card panel"><h3>Cifra do Ministério</h3><pre class="chords">${escapeHtml(s.ministryChord||'Ainda não há uma cifra própria cadastrada.\n\nClique em “Editar” para registrar acordes, entradas e observações da equipe.')}</pre></section><section class="card panel"><h3>Observações da equipe</h3><div class="note-box">${escapeHtml(s.notes||'Nenhuma observação cadastrada ainda.')}</div><div class="section-title" style="margin:26px 0 0;"><span class="subtle" style="font-size:12px;">Última utilização: ${escapeHtml(s.lastUsed)}<br/>Total de utilizações: ${s.usedCount}</span><button class="btn btn-sm btn-primary" data-action="add-to-cult" data-id="${s.id}">＋ Adicionar ao próximo culto</button></div></section><section class="card panel"><h3>Referências adicionais</h3><p class="subtle" style="font-size:13px;">Na próxima etapa, a equipe poderá cadastrar várias versões com explicação própria para cada uma.</p><button class="btn btn-soft" data-action="edit-song" data-id="${s.id}">Cadastrar referência</button></section></div>`; }
+    function renderSongForm(){ const s=selectedSongId?getSong(selectedSongId):null; const isEdit=!!s; const item=s||{title:'',artist:'',key:'',originalKey:'',category:'Celebração',status:'Ativa',video:'',audio:'',chord:'',ministryChord:'',notes:''}; return `<div class="view-head"><div><p class="eyebrow">${isEdit?'Editar música':'Nova música'}</p><h2>${isEdit?'Atualizar repertório':'Adicionar música'}</h2><p class="subtle">Cadastre as informações que ajudam a equipe a estudar e preparar o culto.</p></div></div><section class="card panel"><form id="song-form"><div class="form-grid"><div class="field"><label for="title">Nome da música *</label><input id="title" name="title" required value="${escapeHtml(item.title)}" placeholder="Ex.: Bondade de Deus" /></div><div class="field"><label for="artist">Cantor / ministério / versão</label><input id="artist" name="artist" value="${escapeHtml(item.artist)}" placeholder="Ex.: Isaías Saad" /></div><div class="field"><label for="key">Tom utilizado pela Casa do Oleiro</label><input id="key" name="key" value="${escapeHtml(item.key)}" placeholder="Ex.: G" /></div><div class="field"><label for="originalKey">Tom original</label><input id="originalKey" name="originalKey" value="${escapeHtml(item.originalKey)}" placeholder="Ex.: A" /></div><div class="field"><label for="category">Categoria</label><select id="category" name="category">${categories.map(c=>`<option ${item.category===c?'selected':''}>${c}</option>`).join('')}</select></div><div class="field"><label for="status">Status</label><select id="status" name="status"><option ${item.status==='Ativa'?'selected':''}>Ativa</option><option ${item.status==='Em estudo'?'selected':''}>Em estudo</option><option ${item.status==='Arquivada'?'selected':''}>Arquivada</option></select></div><div class="field full"><label for="video">Link do vídeo (YouTube)</label><input id="video" name="video" type="url" value="${escapeHtml(item.video)}" placeholder="https://youtube.com/..." /></div><div class="field"><label for="audio">Link do áudio (Spotify / YouTube Music)</label><input id="audio" name="audio" type="url" value="${escapeHtml(item.audio)}" placeholder="https://..." /></div><div class="field"><label for="chord">Link da cifra</label><input id="chord" name="chord" type="url" value="${escapeHtml(item.chord)}" placeholder="https://..." /></div><div class="field full"><label for="ministryChord">Cifra do Ministério</label><textarea id="ministryChord" name="ministryChord" placeholder="Intro:\nG - D - Em - C\n\nVerso:\n...">${escapeHtml(item.ministryChord)}</textarea></div><div class="field full"><label for="notes">Observações da equipe</label><textarea id="notes" name="notes" placeholder="Ex.: Começar somente teclado. Subir um tom no último refrão.">${escapeHtml(item.notes)}</textarea></div></div><div class="form-actions"><button type="button" class="btn btn-ghost" data-action="cancel-song-form">Cancelar</button><button type="submit" class="btn btn-primary">${isEdit?'Salvar alterações':'Cadastrar música'}</button></div></form></section>`; }
+    function renderCults(){ const upcoming=state.cults.filter(c=>c.date>='2026-09-21').sort((a,b)=>a.date.localeCompare(b.date)); return `<div class="view-head"><div><p class="eyebrow">Agenda e preparação</p><h2>Cultos</h2><p class="subtle">Monte o repertório, organize a escala e deixe tudo pronto para a equipe.</p></div><button class="btn btn-primary" data-action="new-cult">＋ Novo culto</button></div><div class="cult-grid">${upcoming.map(cultCard).join('')||'<div class="card empty">Nenhum culto futuro cadastrado.</div>'}</div><div class="section-title"><h3>Todos os registros</h3><button class="text-button" data-action="open-history">Ver histórico →</button></div><div class="card list-card">${state.cults.slice().sort((a,b)=>b.date.localeCompare(a.date)).map(eventRow).join('')}</div>`; }
+    function cultCard(c){ const p=dayParts(c.date); return `<article class="card cult-card"><div class="cult-card-head"><div class="date-chip"><strong>${p.day}</strong><small>${p.month}</small></div><div><h3>${escapeHtml(c.type)} — ${escapeHtml(c.title)}</h3><div class="meta">${fmtDate(c.date)} • ${c.time} • ${escapeHtml(c.location)}</div></div></div><div class="chip-row"><span class="chip">${c.songs.length}/6 músicas</span><span class="chip">${c.scale.filter(x=>x.presence==='Confirmado').length} confirmados</span><span class="status ${c.status==='Preparando'?'study':''}">${escapeHtml(c.status)}</span></div><div class="cult-card-actions"><button class="btn btn-primary btn-sm" data-action="open-cult" data-id="${c.id}">Abrir preparação</button><button class="btn btn-ghost btn-sm" data-action="share-cult" data-id="${c.id}">Compartilhar</button></div></article>`; }
+    function renderCultDetail(){ const c=getCult(selectedCultId)||state.cults[0]; return `<div class="detail-head"><button class="back" data-action="open-cults">← Voltar</button><div class="detail-title"><p class="eyebrow">Preparação do culto</p><h2>${escapeHtml(c.type)} — ${escapeHtml(c.title)}</h2><p class="subtle">${fmtDate(c.date)} • ${c.time} • ${escapeHtml(c.location||'Local a definir')}</p></div><div class="detail-actions"><button class="btn btn-soft" data-action="copy-cult" data-id="${c.id}">▣ Copiar para WhatsApp</button><button class="btn btn-primary" data-action="share-cult" data-id="${c.id}">Compartilhar</button></div></div><div class="cult-summary card"><h2>${escapeHtml(c.title)}</h2><p>${escapeHtml(c.notes||'Culto em preparação. Confira o repertório e a escala antes de sábado.')}</p><div class="summary-meta"><span>Equipe chegar<strong>${c.arrival}</strong></span><span>Ensaio / passagem<strong>${c.rehearsal}</strong></span><span>Repertório<strong>${c.songs.length} de 6 músicas</strong></span><span>Status<strong>${escapeHtml(c.status)}</strong></span></div></div><div class="cult-layout" style="margin-top:18px;"><section class="card panel"><div class="section-title" style="margin-top:0;"><h3>Repertório do culto</h3><span class="subtle" style="font-size:12px;">Até 6 músicas</span></div><div class="add-row" style="margin-bottom:15px;"><select id="add-song-select" ${c.songs.length>=6?'disabled':''}><option value="">Selecionar música...</option>${state.songs.filter(s=>!c.songs.includes(s.id)).map(s=>`<option value="${s.id}">${escapeHtml(s.title)} — ${escapeHtml(s.key)}</option>`).join('')}</select><button class="btn btn-primary btn-sm" data-action="add-song-to-cult" data-id="${c.id}" ${c.songs.length>=6?'disabled':''}>Adicionar</button></div><div class="repertoire-list">${c.songs.map((id,i)=>repertoireItem(c,id,i)).join('')||'<div class="empty">Adicione até seis músicas ao repertório.</div>'}</div></section><section class="card panel"><div class="section-title" style="margin-top:0;"><h3>Escala</h3><span class="subtle" style="font-size:12px;">Presença manual</span></div><div class="scale-list">${c.scale.map((x,i)=>scaleRow(c,x,i)).join('')||'<div class="empty">Nenhuma pessoa escalada ainda.</div>'}</div><div class="add-row"><select id="role-select"><option value="">Função...</option>${roles.map(r=>`<option>${r}</option>`).join('')}</select><input id="person-input" placeholder="Nome da pessoa" /><button class="btn btn-primary btn-sm" data-action="add-scale" data-id="${c.id}">＋</button></div></section></div><section class="card panel" style="margin-top:18px;"><h3>Mensagem para a equipe</h3><div class="copy-box">${escapeHtml(buildWhatsApp(c))}</div><div class="form-actions" style="justify-content:flex-start;"><button class="btn btn-soft" data-action="copy-cult" data-id="${c.id}">Copiar repertório e escala</button><button class="btn btn-ghost" data-action="share-cult" data-id="${c.id}">Abrir no WhatsApp</button></div></section>`; }
+    function repertoireItem(c,id,index){ const s=getSong(id); if(!s) return ''; const a=(c.assignments&&c.assignments[id])||{}; return `<div class="repertoire-item"><div class="repertoire-main"><span class="number">${index+1}</span><div><strong>${escapeHtml(s.title)}</strong><small>${escapeHtml(s.artist)} • Tom ${escapeHtml(s.key)} • ${escapeHtml(s.category)}</small></div><button class="btn btn-sm btn-danger" data-action="remove-song-from-cult" data-cult="${c.id}" data-song="${s.id}">×</button></div><div class="repertoire-actions"><button class="btn btn-sm btn-soft" data-action="play" data-id="${s.id}">▶ Ouvir</button><button class="btn btn-sm btn-ghost" data-action="video" data-id="${s.id}">Vídeo</button><button class="btn btn-sm btn-ghost" data-action="chord" data-id="${s.id}">Cifra</button></div><div class="assignment-grid"><input placeholder="Ministro" value="${escapeHtml(a.minister||'')}" data-assign="minister" data-cult="${c.id}" data-song="${s.id}" /><input placeholder="Vocal principal" value="${escapeHtml(a.vocal||'')}" data-assign="vocal" data-cult="${c.id}" data-song="${s.id}" /><input placeholder="Backing vocal" value="${escapeHtml(a.backing||'')}" data-assign="backing" data-cult="${c.id}" data-song="${s.id}" /><input style="grid-column:1/-1" placeholder="Observação desta música" value="${escapeHtml(a.note||'')}" data-assign="note" data-cult="${c.id}" data-song="${s.id}" /></div></div>`; }
+    function scaleRow(c,x,i){ const initials=(x.name||'?').split(' ').map(v=>v[0]).slice(0,2).join('').toUpperCase(); const p=x.presence||'Aguardando'; return `<div class="scale-row"><div class="scale-avatar">${escapeHtml(initials)}</div><div><strong>${escapeHtml(x.name)}</strong><small>${escapeHtml(x.role)}</small></div><button class="presence ${p==='Aguardando'?'wait':p==='Não poderá participar'?'no':''}" data-action="toggle-presence" data-cult="${c.id}" data-index="${i}">${escapeHtml(p)}</button><button class="btn btn-sm btn-danger" data-action="remove-scale" data-cult="${c.id}" data-index="${i}">×</button></div>`; }
+    function renderHistory(){ const past=state.cults.filter(c=>c.date<'2026-09-21').sort((a,b)=>b.date.localeCompare(a.date)); return `<div class="view-head"><div><p class="eyebrow">Memória da equipe</p><h2>Histórico</h2><p class="subtle">Relembre o repertório, os tons e a escala de cada culto.</p></div><button class="btn btn-primary" data-action="open-cults">Ver agenda</button></div><div class="card list-card">${past.map(eventRow).join('')||'<div class="empty">Ainda não há cultos anteriores registrados.</div>'}</div>`; }
+    function bindView(){ document.querySelectorAll('[data-filter]').forEach(b=>b.onclick=()=>{songFilter=b.dataset.filter;render();}); const search=document.getElementById('song-search'); if(search){search.oninput=()=>{songSearch=search.value; const pos=search.selectionStart; document.getElementById('app').innerHTML=renderSongs(); bindView(); const next=document.getElementById('song-search'); next.focus(); next.setSelectionRange(pos,pos);};} document.querySelectorAll('[data-action]').forEach(b=>b.onclick=()=>handleAction(b.dataset.action,b.dataset)); const form=document.getElementById('song-form'); if(form) form.onsubmit=e=>{e.preventDefault(); saveSong(new FormData(form));}; document.querySelectorAll('[data-assign]').forEach(input=>input.onchange=()=>saveAssignment(input)); }
+    function handleAction(action,d){ if(action==='open-songs') return navigate('songs'); if(action==='open-cults') return navigate('cults'); if(action==='open-history') return navigate('history'); if(action==='new-song') {selectedSongId=null;return navigate('song-form');} if(action==='edit-song'){selectedSongId=d.id;return navigate('song-form',d.id);} if(action==='open-song') return navigate('song-detail',d.id); if(action==='open-cult') return navigate('cult-detail',d.id); if(action==='new-cult') return createCult(); if(action==='cancel-song-form') return navigate(selectedSongId?'song-detail':'songs',selectedSongId); if(action==='reset-filters'){songFilter='Todas';songSearch='';return render();} if(['play','video','audio','chord'].includes(action)){const s=getSong(d.id); const url=action==='play'?s.audio:action==='video'?s.video:action==='audio'?s.audio:s.chord; if(url) window.open(url,'_blank','noopener'); else showToast('Cadastre um link para esta referência.');return;} if(action==='add-to-cult'){const c=state.cults.filter(c=>c.date>='2026-09-21').sort((a,b)=>a.date.localeCompare(b.date))[0]; if(c&&!c.songs.includes(d.id)&&c.songs.length<6){c.songs.push(d.id);saveState();showToast('Música adicionada ao próximo culto.');}return;} if(action==='add-song-to-cult'){const c=getCult(d.id);const select=document.getElementById('add-song-select'); if(c&&select.value&&c.songs.length<6){c.songs.push(select.value);c.assignments=c.assignments||{};saveState();render();showToast('Música adicionada ao repertório.');}return;} if(action==='remove-song-from-cult'){const c=getCult(d.cult),i=c.songs.indexOf(d.song);if(i>-1)c.songs.splice(i,1);saveState();render();return;} if(action==='add-scale'){const c=getCult(d.id),role=document.getElementById('role-select')?.value,name=document.getElementById('person-input')?.value.trim();if(c&&role&&name){c.scale.push({role,name,presence:'Aguardando'});saveState();render();showToast('Pessoa adicionada à escala.');}else showToast('Escolha a função e informe o nome.');return;} if(action==='remove-scale'){const c=getCult(d.cult);c.scale.splice(Number(d.index),1);saveState();render();return;} if(action==='toggle-presence'){const c=getCult(d.cult),x=c.scale[Number(d.index)];x.presence=x.presence==='Confirmado'?'Aguardando':x.presence==='Aguardando'?'Não poderá participar':'Confirmado';saveState();render();return;} if(action==='copy-cult'){copyCult(getCult(d.id));return;} if(action==='share-cult'){const c=getCult(d.id);window.open('https://wa.me/?text='+encodeURIComponent(buildWhatsApp(c)),'_blank','noopener');return;} }
+    function saveSong(fd){ const values=Object.fromEntries(fd.entries()); if(!values.title.trim()) return; if(selectedSongId){const s=getSong(selectedSongId);Object.assign(s,values);s.lastUsed=s.lastUsed||'—';saveState();showToast('Música atualizada.');navigate('song-detail',s.id);}else{const id='song-'+Date.now();state.songs.unshift({id,...values,usedCount:0,lastUsed:'—',refs:[]});saveState();showToast('Música cadastrada.');navigate('song-detail',id);} }
+    function saveAssignment(input){ const c=getCult(input.dataset.cult); c.assignments=c.assignments||{}; c.assignments[input.dataset.song]=c.assignments[input.dataset.song]||{}; c.assignments[input.dataset.song][input.dataset.assign]=input.value; saveState(); }
+    function createCult(){ const id='cult-'+(state.nextCultId++); const c={id,type:'Domingo',title:'Novo culto',date:'2026-10-04',time:'18:30',arrival:'17:30',rehearsal:'16:30',location:'Ministério Casa do Oleiro',notes:'',status:'Preparando',songs:[],scale:[],assignments:{}}; state.cults.push(c);saveState();navigate('cult-detail',id);showToast('Novo culto criado.'); }
+    function buildWhatsApp(c){ const songs=c.songs.map((id,i)=>{const s=getSong(id);return s?`${i+1}. ${s.title} — ${s.key}`:''}).filter(Boolean).join('\n')||'Nenhuma música definida'; const scale=c.scale.map(x=>`${x.role} — ${x.name}`).join('\n')||'Escala ainda não definida'; return `🎶 *Ministério de Louvor Casa do Oleiro*\n\n📅 ${c.type} — ${fmtDate(c.date)}\n⏰ Culto: ${c.time}\n🎤 Equipe chegar: ${c.arrival}\n🎼 Ensaio/passagem: ${c.rehearsal}\n\n*REPERTÓRIO*\n${songs}\n\n*ESCALA*\n${scale}\n\nQue Deus conduza nosso culto! 🙏`; }
+    async function copyCult(c){ if(!c)return; try{await navigator.clipboard.writeText(buildWhatsApp(c));showToast('Mensagem copiada para o WhatsApp.');}catch(e){showToast('Não foi possível copiar automaticamente.');} }
+    document.addEventListener('click',e=>{const nav=e.target.closest('[data-nav]'); if(nav) navigate(nav.dataset.nav);});
+    render();
+  </script>
+</body>
+</html>
