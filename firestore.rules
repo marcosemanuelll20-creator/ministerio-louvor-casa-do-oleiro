@@ -1,0 +1,51 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() { return request.auth != null; }
+    function memberPath(uid) { return /databases/$(database)/documents/members/$(uid); }
+    function isMember() {
+      return signedIn() && exists(memberPath(request.auth.uid))
+        && get(memberPath(request.auth.uid)).data.active == true;
+    }
+    function roleIs(value) {
+      return isMember() && get(memberPath(request.auth.uid)).data.role == value;
+    }
+    function isAdmin() { return roleIs('admin'); }
+    function canEdit() { return isAdmin() || roleIs('editor'); }
+    function validRole() { return request.resource.data.role in ['admin', 'editor', 'viewer']; }
+    function validMember() {
+      return request.resource.data.keys().hasAll(['name', 'email', 'role', 'active'])
+        && validRole()
+        && request.resource.data.name is string
+        && request.resource.data.email is string
+        && request.resource.data.active is bool;
+    }
+
+    match /appState/main {
+      allow read: if isMember();
+      allow create, update: if canEdit()
+        && request.resource.data.updatedBy == request.auth.uid
+        && request.resource.data.updatedAt == request.time;
+      allow delete: if false;
+    }
+
+    match /auditLogs/{logId} {
+      allow create: if canEdit()
+        && request.resource.data.userId == request.auth.uid
+        && request.resource.data.createdAt == request.time
+        && request.resource.data.action is string;
+      allow read: if isAdmin()
+        || (roleIs('editor') && resource.data.userId == request.auth.uid);
+      allow update, delete: if false;
+    }
+
+    match /members/{uid} {
+      allow read: if isAdmin() || (isMember() && request.auth.uid == uid);
+      allow create: if isAdmin() && validMember();
+      allow update: if isAdmin() && validMember()
+        && (uid != request.auth.uid || request.resource.data.role == 'admin');
+      allow delete: if isAdmin() && uid != request.auth.uid;
+    }
+  }
+}

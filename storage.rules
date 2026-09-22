@@ -1,0 +1,27 @@
+rules_version = '2';
+
+service firebase.storage {
+  match /b/{bucket}/o {
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function isActiveMember() {
+      return signedIn()
+        && firestore.get(/databases/(default)/documents/members/$(request.auth.uid)).data.active == true;
+    }
+
+    function isEditor() {
+      return isActiveMember()
+        && firestore.get(/databases/(default)/documents/members/$(request.auth.uid)).data.role in ['admin', 'editor'];
+    }
+
+    match /teamPhotos/{userId}/{fileName} {
+      allow read: if isActiveMember();
+      allow write: if isEditor()
+        && request.resource.size < 2 * 1024 * 1024
+        && request.resource.contentType.matches('image/(jpeg|png|webp)');
+      allow delete: if isEditor();
+    }
+  }
+}
