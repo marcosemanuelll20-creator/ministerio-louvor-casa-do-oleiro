@@ -52,6 +52,8 @@
     .auth-copy { font-size: 13px; margin-bottom: 22px; }
     .auth-close { position: absolute; top: 10px; right: 14px; border: 0; background: transparent; color: var(--muted); font-size: 28px; line-height: 1; }
     .auth-actions { margin-top: 18px; }
+    .auth-google { width: 100%; margin-top: 12px; }
+    .auth-card.signed-in .auth-google { display: none; }
     .auth-logout { width: 100%; display: none; margin-top: 14px; }
     .auth-status { min-height: 20px; margin: 14px 0 0; font-size: 12px; color: var(--deep-2); }
     .auth-card.signed-in #auth-form { display: none; }
@@ -264,13 +266,14 @@
         <div class="field"><label for="auth-password">Senha</label><input id="auth-password" type="password" required minlength="6" autocomplete="current-password" placeholder="Mínimo de 6 caracteres" /></div>
         <div class="form-actions auth-actions"><button class="btn btn-ghost" type="button" id="auth-create">Criar conta</button><button class="btn btn-primary" type="submit">Entrar</button></div>
       </form>
+      <button class="btn btn-soft auth-google" id="auth-google" type="button">◉ Entrar com Google</button>
       <button class="btn btn-danger auth-logout" id="auth-logout" type="button">Sair da conta</button>
       <p class="auth-status" id="auth-status"></p>
     </div>
   </div>
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-    import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
     import { getFirestore, doc, getDoc, setDoc, addDoc, collection, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
     const firebaseConfig = {
@@ -355,6 +358,7 @@
     document.getElementById('auth-modal')?.addEventListener('click',e=>{if(e.target.id==='auth-modal')closeAuth();});
     document.getElementById('auth-form')?.addEventListener('submit',async e=>{e.preventDefault(); const email=document.getElementById('auth-email').value.trim(), password=document.getElementById('auth-password').value; setAuthMessage('Entrando...'); try { await signInWithEmailAndPassword(auth,email,password); setAuthMessage('Login realizado.'); closeAuth(); } catch(error){ console.error(error); setAuthMessage('Não foi possível entrar. Verifique o e-mail e a senha.',true); } });
     document.getElementById('auth-create')?.addEventListener('click',async()=>{const email=document.getElementById('auth-email').value.trim(), password=document.getElementById('auth-password').value; if(!email||password.length<6){setAuthMessage('Informe um e-mail e uma senha com pelo menos 6 caracteres.',true);return;} setAuthMessage('Criando conta...'); try { await createUserWithEmailAndPassword(auth,email,password); setAuthMessage('Conta criada.'); closeAuth(); } catch(error){ console.error(error); setAuthMessage('Não foi possível criar a conta. Confirme se o login por e-mail está ativado no Firebase.',true); } });
+    document.getElementById('auth-google')?.addEventListener('click',async()=>{setAuthMessage('Abrindo o Google...'); try { await signInWithPopup(auth,new GoogleAuthProvider()); setAuthMessage('Login realizado.'); closeAuth(); } catch(error){ console.error(error); setAuthMessage('Não foi possível entrar com Google. Confira os domínios autorizados do Firebase.',true); } });
     document.getElementById('auth-logout')?.addEventListener('click',async()=>{await signOut(auth);closeAuth();showToast('Você saiu da conta.');});
     render();
     onAuthStateChanged(auth,user=>{ currentUser=user; updateAuthUI(); if(user) syncFromCloud(); });
