@@ -12,7 +12,8 @@ service cloud.firestore {
       return isMember() && get(memberPath(request.auth.uid)).data.role == value;
     }
     function isAdmin() { return roleIs('admin'); }
-    function canEdit() { return isAdmin(); }
+    function isEditor() { return roleIs('editor'); }
+    function canEdit() { return isAdmin() || isEditor(); }
     function validRole() { return request.resource.data.role in ['admin', 'editor', 'viewer']; }
     function validMember() {
       return request.resource.data.keys().hasAll(['name', 'email', 'role', 'active'])
@@ -40,11 +41,42 @@ service cloud.firestore {
     }
 
     match /members/{uid} {
-      allow read: if isAdmin() || (isMember() && request.auth.uid == uid);
+      allow get: if isAdmin() || (signedIn() && request.auth.uid == uid);
+      allow list: if isAdmin();
       allow create: if isAdmin() && validMember();
       allow update: if isAdmin() && validMember()
-        && (uid != request.auth.uid || request.resource.data.role == 'admin');
+        && (uid != request.auth.uid || (request.resource.data.role == 'admin' && request.resource.data.active == true && request.auth.token.email is string && request.resource.data.email.lower() == request.auth.token.email.lower()));
       allow delete: if isAdmin() && uid != request.auth.uid;
+    }
+
+    match /accessRequests/{uid} {
+      allow create: if signedIn() && request.auth.uid == uid
+        && request.auth.token.email_verified == true
+        && request.resource.data.keys().hasOnly(['uid', 'name', 'email', 'status', 'createdAt'])
+        && request.resource.data.uid == uid
+        && request.resource.data.name is string
+        && request.resource.data.email == request.auth.token.email
+        && request.resource.data.status == 'pending'
+        && request.resource.data.createdAt == request.time;
+      allow read: if isAdmin() || (signedIn() && request.auth.uid == uid);
+      allow update: if false;
+      allow delete: if isAdmin();
+    }
+
+    match /cultResponses/{cultId}/members/{uid} {
+      function validResponse() {
+        return request.resource.data.keys().hasOnly(['uid', 'name', 'attendance', 'observation', 'updatedAt'])
+          && request.resource.data.uid == uid
+          && request.resource.data.name is string
+          && request.resource.data.name.size() <= 100
+          && request.resource.data.attendance in ['pending', 'confirmed', 'declined']
+          && request.resource.data.observation is string
+          && request.resource.data.observation.size() <= 500
+          && request.resource.data.updatedAt == request.time;
+      }
+      allow read: if isAdmin() || isEditor() || (isMember() && request.auth.uid == uid);
+      allow create, update: if isMember() && request.auth.uid == uid && validResponse();
+      allow delete: if false;
     }
   }
 }

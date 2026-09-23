@@ -16,12 +16,18 @@ service firebase.storage {
         && firestore.get(/databases/(default)/documents/members/$(request.auth.uid)).data.role in ['admin', 'editor'];
     }
 
+    function isAdmin() {
+      return isActiveMember()
+        && firestore.get(/databases/(default)/documents/members/$(request.auth.uid)).data.role == 'admin';
+    }
+
     match /teamPhotos/{userId}/{fileName} {
       allow read: if isActiveMember();
       allow write: if isEditor()
+        && (isAdmin() || userId == request.auth.uid)
         && request.resource.size < 2 * 1024 * 1024
         && request.resource.contentType.matches('image/(jpeg|png|webp)');
-      allow delete: if isEditor();
+      allow delete: if isEditor() && (isAdmin() || userId == request.auth.uid);
     }
   }
 }

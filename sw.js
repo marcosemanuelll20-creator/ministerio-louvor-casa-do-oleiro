@@ -1,4 +1,4 @@
-const CACHE = 'casa-do-oleiro-v4';
+const CACHE = 'casa-do-oleiro-v5';
 const ASSETS = ['./', './index.html', './logo-casa-do-oleiro.png', './manifest.webmanifest'];
 self.addEventListener('install', event => {
   event.waitUntil(caches.open(CACHE).then(cache => cache.addAll(ASSETS)));
