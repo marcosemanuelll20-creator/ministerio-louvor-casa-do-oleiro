@@ -4,8 +4,12 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="theme-color" content="#153b3f" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-title" content="Casa do Oleiro" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
   <meta name="description" content="Repertório, escalas, cultos e estudos do Ministério de Louvor Casa do Oleiro." />
   <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="apple-touch-icon" href="icons/icon-192.png" />
   <title>Ministério de Louvor Casa do Oleiro</title>
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='18' fill='%23153b3f'/%3E%3Cpath d='M18 43V21l14-7 14 7v22M25 43V30h14v13' fill='none' stroke='%23f0c56b' stroke-width='5' stroke-linejoin='round'/%3E%3C/svg%3E" />
   <style>
@@ -74,6 +78,17 @@
     .auth-card.signed-in .auth-logout { display: inline-flex; }
     .auth-card:not(.signed-in) .auth-logout, .auth-card.signed-in .auth-reset { display: none; }
     .auth-card.signed-in .auth-copy:after { content: ' Você está conectado e as alterações serão sincronizadas.'; color: var(--deep-2); font-weight: 700; }
+    [hidden] { display: none !important; }
+    .install-modal { position: fixed; inset: 0; z-index: 60; display: none; place-items: center; padding: 18px; overflow-y: auto; background: rgba(42,27,32,.56); backdrop-filter: blur(6px); }
+    .install-modal.open { display: grid; }
+    .install-card { position: relative; width: min(100%, 560px); max-height: calc(100dvh - 36px); overflow-y: auto; padding: 28px; background: var(--surface); border: 1px solid var(--line); border-radius: 24px; box-shadow: 0 26px 70px rgba(42,27,32,.3); }
+    .install-card h2 { font-size: 27px; }
+    .install-options { display: flex; flex-wrap: wrap; gap: 8px; margin: 18px 0; }
+    .install-options button[aria-pressed="true"] { background: var(--deep); color: #fff; border-color: var(--deep); }
+    .install-step { padding: 16px; background: #fffbfb; border: 1px solid var(--line); border-radius: 16px; }
+    .install-step ol { padding-left: 22px; margin: 10px 0 0; }
+    .install-step li { margin: 7px 0; }
+    .install-close { position: absolute; top: 10px; right: 14px; border: 0; background: transparent; color: var(--muted); font-size: 28px; line-height: 1; }
     .content-wrap { min-width: 0; flex: 1; background: radial-gradient(circle at 96% 5%, rgba(216,154,165,.12), transparent 24%), var(--canvas); }
     .topbar { height: 78px; background: rgba(255,250,251,.94); backdrop-filter: blur(14px); border-top: 4px solid var(--deep-2); border-bottom: 1px solid var(--line); box-shadow: 0 5px 20px rgba(84,21,31,.07); display: flex; align-items: center; justify-content: space-between; padding: 0 clamp(20px, 4vw, 55px); position: sticky; top: 0; z-index: 10; }
     .topbar-title { display: grid; gap: 2px; }
@@ -254,6 +269,7 @@
       .mobile-nav small { font-size: 9px; white-space: nowrap; }
       .event-row { padding: 13px 9px; }
     }
+    @media (max-width: 480px) { .install-help-label { display: none; } .topbar-right { gap: 6px; } .topbar-right .btn { padding: 8px 9px; } }
   </style>
 </head>
 <body>
@@ -266,12 +282,27 @@
       <div class="sidebar-note"><strong>Casa do Oleiro</strong>Repertório, escalas e cultos organizados para servir melhor.</div>
     </aside>
     <div class="content-wrap">
-      <header class="topbar"><div class="mobile-brand"><div class="brand-mark logo-mark"><img src="logo-casa-do-oleiro.png" alt="Logo Casa do Oleiro" /></div><span>Casa do Oleiro</span></div><div class="topbar-title"><strong>Ministério de Louvor Casa do Oleiro</strong><span>Repertório • Escalas • Cultos • Estudos</span></div><div class="topbar-right"><span class="online-dot" id="connection-dot"></span><span class="topbar-label" id="connection-label">Entre para acessar</span><button class="btn btn-sm btn-ghost" id="auth-button" type="button">Entrar</button></div></header>
+      <header class="topbar"><div class="mobile-brand"><div class="brand-mark logo-mark"><img src="logo-casa-do-oleiro.png" alt="Logo Casa do Oleiro" /></div><span>Casa do Oleiro</span></div><div class="topbar-title"><strong>Ministério de Louvor Casa do Oleiro</strong><span>Repertório • Escalas • Cultos • Estudos</span></div><div class="topbar-right"><span class="online-dot" id="connection-dot"></span><span class="topbar-label" id="connection-label">Entre para acessar</span><button class="btn btn-sm btn-ghost" id="install-help-button" type="button" aria-label="Como instalar na tela inicial"><span aria-hidden="true">＋</span><span class="install-help-label">Instalar</span></button><button class="btn btn-sm btn-ghost" id="auth-button" type="button">Entrar</button></div></header>
       <main id="app"></main>
     </div>
   </div>
   <nav class="mobile-nav" id="mobile-nav"></nav>
   <div class="toast" id="toast"></div>
+  <div class="install-modal" id="install-modal" aria-hidden="true">
+    <section class="install-card" role="dialog" aria-modal="true" aria-labelledby="install-title">
+      <button class="install-close" id="install-close" type="button" aria-label="Fechar tutorial">×</button>
+      <p class="eyebrow">Acesso rápido</p>
+      <h2 id="install-title">Coloque o app na tela inicial</h2>
+      <p class="subtle">É um atalho instalado pelo navegador, sem baixar pela loja. A instalação é opcional e não altera sua conta.</p>
+      <div class="install-options" role="group" aria-label="Escolha seu aparelho">
+        <button class="btn btn-ghost" type="button" data-install-platform="android" aria-pressed="false">Android</button>
+        <button class="btn btn-ghost" type="button" data-install-platform="ios" aria-pressed="false">iPhone / iPad</button>
+        <button class="btn btn-ghost" type="button" data-install-platform="desktop" aria-pressed="false">Computador</button>
+      </div>
+      <div class="install-step" id="install-steps" aria-live="polite"></div>
+      <div class="form-actions" style="justify-content:flex-start;margin-top:16px"><button class="btn btn-primary" id="install-pwa" type="button" hidden>Instalar agora</button></div>
+    </section>
+  </div>
   <div class="auth-modal" id="auth-modal" aria-hidden="true">
     <div class="auth-card" role="dialog" aria-modal="true" aria-labelledby="auth-title">
       <button class="auth-close" id="auth-close" type="button" aria-label="Fechar">×</button>
@@ -423,6 +454,12 @@
     function queueCloudSave(action){ if(!currentUser)return; clearTimeout(cloudSaveTimer); cloudSaveTimer=setTimeout(()=>writeCloudState(action),700); }
     async function legacyWriteCloudState(action='Atualização'){ if(!canEdit())return; try { await setDoc(doc(db,'appState','main'),{songs:state.songs,cults:state.cults,team:state.team,nextCultId:state.nextCultId,updatedAt:serverTimestamp(),updatedBy:currentUser.uid},{merge:false}); await addDoc(collection(db,'auditLogs'),{action,userId:currentUser.uid,email:currentUser.email||'',createdAt:serverTimestamp()}); setConnection('Sincronizado',true); } catch(error){ console.error(error); setConnection('Falha ao salvar',false); showToast('Não foi possível salvar no Firebase.'); } }
     function showToast(msg){ const el=document.getElementById('toast'); el.textContent=msg; el.classList.add('show'); clearTimeout(window.__toast); window.__toast=setTimeout(()=>el.classList.remove('show'),2300); }
+    let deferredInstallPrompt=null;
+    function isStandalone(){return window.matchMedia?.('(display-mode: standalone)').matches||navigator.standalone===true;}
+    function detectInstallPlatform(){const ua=navigator.userAgent||'';if(/iPhone|iPad|iPod/i.test(ua)||(/Macintosh/i.test(ua)&&navigator.maxTouchPoints>1))return'ios';if(/Android/i.test(ua))return'android';return'desktop';}
+    function renderInstallSteps(platform){const container=document.getElementById('install-steps'),installButton=document.getElementById('install-pwa');if(!container||!installButton)return;document.querySelectorAll('[data-install-platform]').forEach(button=>button.setAttribute('aria-pressed',String(button.dataset.installPlatform===platform)));const installed=isStandalone();const intro=installed?'<p><strong>O app já está aberto como aplicativo instalado neste aparelho.</strong></p>':'';const instructions={android:'<strong>Android — Chrome</strong><ol><li>Abra o link do Casa do Oleiro no aplicativo Chrome.</li><li>Toque no menu ⋮, no canto superior.</li><li>Escolha <em>Instalar app</em> ou <em>Adicionar à tela inicial</em> e confirme.</li><li>Procure o ícone Casa do Oleiro na tela inicial.</li></ol><p class="subtle">O nome da opção pode variar conforme o aparelho e a versão do Chrome. Se não aparecer, use o menu do Chrome ou tente novamente pelo Chrome.</p>',ios:'<strong>iPhone / iPad — Safari</strong><ol><li>Abra este link no Safari (não dentro de outro aplicativo).</li><li>Toque em Compartilhar.</li><li>Role as opções e escolha <em>Adicionar à Tela de Início</em>. Se não aparecer, procure em <em>Editar Ações</em>.</li><li>Se aparecer a opção <em>Abrir como App da Web</em>, deixe-a ativada; depois toque em <em>Adicionar</em>.</li><li>Procure o ícone Casa do Oleiro na tela inicial.</li></ol><p class="subtle">No iPhone, a instalação é feita pelo menu Compartilhar do Safari; o botão automático de instalação do Android não é oferecido da mesma forma.</p>',desktop:'<strong>Computador — Chrome ou Edge</strong><ol><li>Abra o site no Chrome ou Edge.</li><li>Procure o ícone de instalação na barra de endereço ou abra o menu ⋮.</li><li>Escolha <em>Instalar Casa do Oleiro</em> ou <em>Instalar este site como aplicativo</em> e confirme.</li></ol><p class="subtle">A opção só aparece quando o navegador e o site atendem aos requisitos de instalação.</p>'};let extra='';if(platform==='ios'&&/(CriOS|FxiOS|EdgiOS|OPiOS)/i.test(navigator.userAgent||''))extra='<p class="permission-note">Você está em um navegador diferente do Safari. Para seguir este passo a passo, abra o link no Safari.</p>';container.innerHTML=intro+extra+instructions[platform];installButton.hidden=!deferredInstallPrompt||installed;}
+    function openInstallHelp(){const modal=document.getElementById('install-modal');if(!modal)return;modal.classList.add('open');modal.setAttribute('aria-hidden','false');renderInstallSteps(detectInstallPlatform());document.querySelector('#install-close')?.focus();}
+    function closeInstallHelp(){const modal=document.getElementById('install-modal');if(!modal)return;modal.classList.remove('open');modal.setAttribute('aria-hidden','true');document.getElementById('install-help-button')?.focus();}
     function navigate(view, id=null){ if(view==='scale'){ const next=nextCult(); selectedCultId=next?.id||null; currentView='scale'; } else { currentView=view; if(view==='song-detail') selectedSongId=id; if(view==='cult-detail') selectedCultId=id; } render(); window.scrollTo({top:0,behavior:'smooth'}); }
     function navMarkup(){ return navItems.map(n=>`<button class="${currentView===n.id || (n.id==='cults'&&currentView==='cult-detail') || (n.id==='songs'&&currentView==='song-detail') ? 'active':''}" data-nav="${n.id}"><span class="nav-icon">${n.icon}</span>${n.label}</button>`).join(''); }
     function visibleNavItems(){ return navItems.filter(n=>(n.id!=='access'||isAdmin())&&(n.id!=='song-form'||canEdit())); }
@@ -490,6 +527,14 @@
     document.getElementById('auth-logout')?.addEventListener('click',async()=>{await signOut(auth);currentRole='pending';state=cloneData(initialState);closeAuth();render();showToast('Você saiu da conta.');});
     document.addEventListener('click',e=>{const button=e.target.closest('[data-action="export-songs"]');if(button){e.preventDefault();downloadSongsCsv();}});
     document.addEventListener('click',e=>{const button=e.target.closest('[data-action="share-song"]');if(!button)return;if(!requireEditor())return;const song=getSong(button.dataset.id);if(song)window.open('https://wa.me/?text='+encodeURIComponent(buildSongWhatsApp(song)),'_blank','noopener');});
+    document.getElementById('install-help-button')?.addEventListener('click',openInstallHelp);
+    document.getElementById('install-close')?.addEventListener('click',closeInstallHelp);
+    document.getElementById('install-modal')?.addEventListener('click',e=>{if(e.target.id==='install-modal')closeInstallHelp();});
+    document.addEventListener('keydown',e=>{if(e.key==='Escape'&&document.getElementById('install-modal')?.classList.contains('open'))closeInstallHelp();});
+    document.querySelectorAll('[data-install-platform]').forEach(button=>button.addEventListener('click',()=>renderInstallSteps(button.dataset.installPlatform)));
+    document.getElementById('install-pwa')?.addEventListener('click',async()=>{if(!deferredInstallPrompt)return;const prompt=deferredInstallPrompt;deferredInstallPrompt=null;document.getElementById('install-pwa').hidden=true;try{await prompt.prompt();const result=await prompt.userChoice;if(result?.outcome==='accepted'){showToast('Instalação solicitada. Confira o ícone na tela inicial.');}else{showToast('Tudo bem. Você pode instalar depois pelo tutorial.');}}catch(error){console.warn('Prompt de instalação indisponível:',error);showToast('Use as instruções do navegador para adicionar o app.');}});
+    window.addEventListener('beforeinstallprompt',event=>{event.preventDefault();deferredInstallPrompt=event;if(document.getElementById('install-modal')?.classList.contains('open'))renderInstallSteps(document.querySelector('[data-install-platform][aria-pressed="true"]')?.dataset.installPlatform||detectInstallPlatform());});
+    window.addEventListener('appinstalled',()=>{deferredInstallPrompt=null;if(document.getElementById('install-modal')?.classList.contains('open'))renderInstallSteps(detectInstallPlatform());showToast('Casa do Oleiro foi instalado neste aparelho.');});
     if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(()=>{});
     const sourceObserver=new MutationObserver(()=>{sourceObserver.disconnect();enhanceSongSources();sourceObserver.observe(document.getElementById('app'),{childList:true,subtree:true});});
     sourceObserver.observe(document.getElementById('app'),{childList:true,subtree:true});
